@@ -51,7 +51,7 @@ def processTweets(pid, records):
 
     proj = pyproj.Proj(init="epsg:2263", preserve_units=True)
     index, zones = createIndex('500cities_tracts.geojson')
-    shapefile =  gpd.read_file('500cities_tracts.geojson').to_crs(fiona.crs.from_epsg(2263))
+    #shapefile =  gpd.read_file('500cities_tracts.geojson').to_crs(fiona.crs.from_epsg(2263))
 
     reader = csv.reader(records, delimiter='|')
     for row in reader:
@@ -61,7 +61,7 @@ def processTweets(pid, records):
                     p = geom.Point(proj(float(row[2]), float(row[1])))
                     tweet_zone = findZone(p, index, zones)
                     if tweet_zone:
-                        yield(shapefile['plctract10'][int(tweet_zone)], 1)
+                        yield(zones.properties.plctract10[int(tweet_zone)], 1)
             except:
                 continue
 
