@@ -154,11 +154,11 @@ if __name__=='__main__':
     new_result = full_result.groupBy(full_result.physicalID)\
     .pivot("year", ["2015", "2016", "2017", "2018", "2019"])\
     .sum("count")
-
+    print("loading6")
     #use the full list as the base for the join, fill the nones with 0
     final_result = centerline_base.join(new_result, (centerline_base.ID == new_result.physicalID), 'left')\
     .fillna({'2015':'0','2016':'0', '2017':'0','2018':'0','2019':'0'}).drop('dummy','physicalID')
-
+    print("loading7")
     #calculate coef, sort by id and output as csv
     final_result.rdd.map(lambda x: (x[0], (x[1],x[2],x[3],x[4],x[5],getCoef(x[1:6]))))\
         .sortByKey()\
