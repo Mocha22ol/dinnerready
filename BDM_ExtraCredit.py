@@ -79,7 +79,7 @@ if __name__=='__main__':
     #        .reduceByKey(lambda x,y: x+y)
     #result = spark.createDataFrame(result, ('tractID','tweets'))
     #print("start base structure")
-    df = sqlContext.read.load('500cities_tracts.geojson', format="json")
+    df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
     df.printSchema()
     #base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
     #print("test")
