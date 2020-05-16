@@ -5,6 +5,7 @@ import csv
 import time
 import geopandas as gpd
 import shapely.geometry as geom
+from pyspark.sql import SQLContext
 
 def createIndex(shapefile): 
     import rtree
@@ -67,7 +68,7 @@ def processTweets(pid, records):
 if __name__=='__main__':
     sc = SparkContext()
     spark = SparkSession(sc)
-
+    sqlContext = SQLContext(sc)
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
     print("***START***")
