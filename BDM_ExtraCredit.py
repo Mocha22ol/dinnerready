@@ -17,13 +17,6 @@ def createIndex(shapefile):
         index.insert(idx, geometry.bounds)
     return (index, zones)
 
-def getTracts(shapefile):
-    proj = pyproj.Proj(init="epsg:2263", preserve_units=True)                                                                         
-    zones = gpd.read_file(shapefile).to_crs(fiona.crs.from_epsg(2263))
-    tracts = list(zones.plctract10)
-    pop = list(zones.plctrpop10)
-    return tracts, pop
-
 def findZone(p, index, zones):
     match = index.intersection((p.x, p.y, p.x, p.y))
     for idx in match:
@@ -51,7 +44,6 @@ def processTweets(pid, records):
 
     proj = pyproj.Proj(init="epsg:2263", preserve_units=True)
     index, zones = createIndex('500cities_tracts.geojson')
-    #shapefile =  gpd.read_file('500cities_tracts.geojson').to_crs(fiona.crs.from_epsg(2263))
 
     reader = csv.reader(records, delimiter='|')
     for row in reader:
@@ -61,7 +53,7 @@ def processTweets(pid, records):
                     p = geom.Point(proj(float(row[2]), float(row[1])))
                     tweet_zone = findZone(p, index, zones)
                     if tweet_zone:
-                        yield(zones.properties.plctract10[int(tweet_zone)], 1)
+                        yield(1,1)
             except:
                 continue
 
