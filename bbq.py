@@ -41,7 +41,7 @@ def toCSV(_, records):
         yield ','.join((str(physicalID),str(count_2015),str(count_2016),str(count_2017),str(count_2018),str(count_2019),str(coef)))
 
     
-def processCenter(partId, records):
+def processCenterline(partId, records):
     if partId==0:
         next(records)
     reader = csv.reader(records)
