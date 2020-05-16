@@ -37,7 +37,7 @@ if __name__=='__main__':
     current_time = time.strftime("%H:%M:%S", t)
     print("***START***")
     print(current_time)
-    tweets = sc.textFile('hdfs:///tmp/tweets-100m.csv')
+    tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
     print(result.take(1))
