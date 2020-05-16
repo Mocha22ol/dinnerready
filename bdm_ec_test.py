@@ -12,10 +12,10 @@ def flagDrugTweet(tweet, full_list):
 
 def processTweets(pid, records):
 
-    with open('hdfs:///tmp/bdm/drug_sched2.txt') as file:
+    with open('drug_sched2.txt') as file:
         sched2 = file.read().splitlines()
 
-    with open('hdfs:///tmp/bdm/drug_illegal.txt') as file:
+    with open('drug_illegal.txt') as file:
         term2 = file.read().splitlines()
 
     full_list = sched2 + term2
