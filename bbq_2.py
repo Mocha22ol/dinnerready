@@ -124,6 +124,8 @@ if __name__=='__main__':
     centerlines_df = spark.createDataFrame(centerline_all, ('physicalID','low_house_number_1','low_house_number_2','high_house_number_1','high_house_number_2','boro','street_name','street_label','even_flag'))
     centerlines_df_new = (centerlines_df.drop('street_name').withColumnRenamed("street_label", "street_name"))\
     .union(centerlines_df.drop('street_label')).distinct()
+
+    print(centerlines_df_new.take(10))
     #split tickets into odd and even
     print("loading4")
     tickets_odds = parking_tickets_df.filter(parking_tickets_df.even_flag == False)
