@@ -24,8 +24,8 @@ def processTweets(pid, records):
     for row in reader:
         if len(row) == 7:
             try:
-                if flagDrugTweet(row[5],full_list):
-                    yield(row[5][1],1) 
+                if True:
+                    yield(1,1) 
             except:
                 continue
 
