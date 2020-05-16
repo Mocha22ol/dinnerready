@@ -121,8 +121,8 @@ if __name__=='__main__':
     
     #stacking centerline name + label but only keep the distinct values, save into a dataframe
     centerlines_df = spark.createDataFrame(centerline_all, ('physicalID','low_house_number_1','low_house_number_2','high_house_number_1','high_house_number_2','boro','street_name','street_label','even_flag'))
-    centerlines_df_new = (centerline_df.drop('street_name').withColumnRenamed("street_label", "street_name"))\
-    .union(centerline_df.drop('street_label')).distinct()
+    centerlines_df_new = (centerlines_df.drop('street_name').withColumnRenamed("street_label", "street_name"))\
+    .union(centerlines_df.drop('street_label')).distinct()
     #split tickets into odd and even
     tickets_odds = parking_tickets_df.filter(parking_tickets_df.even_flag == False)
     tickets_evens = parking_tickets_df.filter(parking_tickets_df.even_flag == True)
