@@ -112,14 +112,13 @@ if __name__=='__main__':
     parking_tickets_df = spark.createDataFrame(parking_ticket_clean, ('year','house_number_1','house_number_2' ,'boro','street_name','even_flag'))
     
     #loading centerline segments with name and label
-    print("loading")
     centerlines = sc.textFile('hdfs:///tmp/bdm/nyc_cscl.csv')
     centerline_all = centerlines.mapPartitionsWithIndex(processCenterline)
-    print("loading2")
+
     #get full list of centerline physicalID and create dataframe 
     centerline_full_id_only = centerlines.mapPartitionsWithIndex(getPhysicalID).distinct()
     centerline_base = spark.createDataFrame(centerline_full_id_only, ('ID','dummy'))
-    print("loading3")
+
     #stacking centerline name + label but only keep the distinct values, save into a dataframe
     centerlines_df = spark.createDataFrame(centerline_all, ('physicalID','low_house_number_1','low_house_number_2','high_house_number_1','high_house_number_2','boro','street_name','street_label','even_flag'))
     centerlines_df_new = (centerlines_df.drop('street_name').withColumnRenamed("street_label", "street_name"))\
