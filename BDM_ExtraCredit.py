@@ -80,7 +80,7 @@ if __name__=='__main__':
     #result = spark.createDataFrame(result, ('tractID','tweets'))
     #print("start base structure")
     df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
-    df.select(f.explode(df.properties).alias('properties')).select('properties.*').show(truncate=False)
+    df.select(f.explode(df.features.properties).alias('properties')).select('properties.*').show(truncate=False)
 
     #base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
     #print("test")
