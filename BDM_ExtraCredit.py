@@ -69,16 +69,16 @@ if __name__=='__main__':
     tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
-    result.take(10)
-    print("start base structure")
-    df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
-    base_df = df.select(f.explode(df.features.properties).alias('properties')).select('properties.*')
-
-    
-    result_new = base_df.join(result, base_df.plctract10 == result.tweets, "left").drop('tractID')\
-          .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop'))
-
-    test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2], x[3])))\
-        .sortByKey()\
-        .mapPartitionsWithIndex(toCSV)\
-        .take(10)
+    #result.take(10)
+    #print("start base structure")
+    #df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
+    #base_df = df.select(f.explode(df.features.properties).alias('properties')).select('properties.*')
+#
+    #
+    #result_new = base_df.join(result, base_df.plctract10 == result.tweets, "left").drop('tractID')\
+    #      .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop'))
+#
+    #test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2], x[3])))\
+    #    .sortByKey()\
+    #    .mapPartitionsWithIndex(toCSV)\
+    #    .take(10)
