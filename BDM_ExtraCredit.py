@@ -1,6 +1,4 @@
 from pyspark import SparkContext
-import fiona.crs
-import geopandas as gpd
 import pyspark.sql.functions as f
 from pyspark.sql.session import SparkSession
 import csv
@@ -8,6 +6,8 @@ import time
 
 def createIndex(shapefile):                                                                         
     import rtree
+    import fiona.crs
+    import geopandas as gpd
     zones = gpd.read_file(shapefile).to_crs(fiona.crs.from_epsg(2263))
     index = rtree.Rtree()
     for idx,geometry in enumerate(zones.geometry):
@@ -35,6 +35,8 @@ def toCSV(_, records):
 
 def processTweets(pid, records):
     import pyproj
+    import fiona.crs
+    import geopandas as gpd
     import shapely.geometry as geom
 
     with open('drug_sched2.txt') as file:
@@ -73,15 +75,15 @@ if __name__=='__main__':
     tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
-    result = spark.createDataFrame(result, ('tractID','tweets'))
+    #result = spark.createDataFrame(result, ('tractID','tweets'))
     print("start base structure")
-    tract, pop = getTracts("hdfs:///tmp/bdm/500cities_tracts.geojson")
-    base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
+    #tract, pop = getTracts("hdfs:///tmp/bdm/500cities_tracts.geojson")
+    #base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
 
-    result_new = base_df.join(result, base_df.tract == result.tractID, "left").drop('tractID')\
-          .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop')).drop('tweets')
+    #result_new = base_df.join(result, base_df.tract == result.tractID, "left").drop('tractID')\
+    #      .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop')).drop('tweets')
 
-    test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2])))\
-        .sortByKey()\
-        .mapPartitionsWithIndex(toCSV)\
-        .saveAsTextFile(sys.argv[1])
+    #test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2])))\
+    #    .sortByKey()\
+    #    .mapPartitionsWithIndex(toCSV)\
+    #    .saveAsTextFile(sys.argv[1])
