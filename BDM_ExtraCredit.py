@@ -51,8 +51,8 @@ def processTweets(pid, records):
             try:
                 if any(ele in row[5] for ele in full_list):
                     p = geom.Point(proj(float(row[2]), float(row[1])))
-                    tweet_zone = findZone(p, index, zones)
-                    if tweet_zone:
+                    #tweet_zone = findZone(p, index, zones)
+                    if True:
                         yield(1,1)
             except:
                 continue
