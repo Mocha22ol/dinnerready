@@ -3,8 +3,10 @@ import pyspark.sql.functions as f
 from pyspark.sql.session import SparkSession
 import csv
 import time
+import geopandas as gpd
+import shapely.geometry as geom
 
-def createIndex(shapefile):                                                                         
+def createIndex(shapefile): 
     import rtree
     import fiona.crs
     import geopandas as gpd
@@ -14,7 +16,8 @@ def createIndex(shapefile):
         index.insert(idx, geometry.bounds)
     return (index, zones)
 
-def getTracts(shapefile):                                                                         
+def getTracts(shapefile):
+    proj = pyproj.Proj(init="epsg:2263", preserve_units=True)                                                                         
     zones = gpd.read_file(shapefile).to_crs(fiona.crs.from_epsg(2263))
     tracts = list(zones.plctract10)
     pop = list(zones.plctrpop10)
@@ -36,8 +39,6 @@ def toCSV(_, records):
 def processTweets(pid, records):
     import pyproj
     import fiona.crs
-    import geopandas as gpd
-    import shapely.geometry as geom
 
     with open('drug_sched2.txt') as file:
         sched2 = file.read().splitlines()
@@ -75,11 +76,11 @@ if __name__=='__main__':
     tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
-    #result = spark.createDataFrame(result, ('tractID','tweets'))
+    result = spark.createDataFrame(result, ('tractID','tweets'))
     print("start base structure")
-    #tract, pop = getTracts("hdfs:///tmp/bdm/500cities_tracts.geojson")
-    #base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
-
+    tract, pop = getTracts("hdfs:///tmp/bdm/500cities_tracts.geojson")
+    base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
+    print("test")
     #result_new = base_df.join(result, base_df.tract == result.tractID, "left").drop('tractID')\
     #      .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop')).drop('tweets')
 
