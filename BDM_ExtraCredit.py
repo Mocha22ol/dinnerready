@@ -77,7 +77,7 @@ if __name__=='__main__':
     tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
-    result = spark.createDataFrame(result, ('tractID','tweets'))
+    result.take(10)
     print("start base structure")
     df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
     base_df = df.select(f.explode(df.features.properties).alias('properties')).select('properties.*')
