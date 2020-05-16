@@ -79,10 +79,9 @@ if __name__=='__main__':
     #        .reduceByKey(lambda x,y: x+y)
     #result = spark.createDataFrame(result, ('tractID','tweets'))
     #print("start base structure")
-    df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json").select('properties.plctract10','properties.plctrpop10')
-    df.show()
-    clean_df = sqlContext.sql("SELECT properties.plctract10,properties.plctrpop10")
-    clean_df.show()
+    df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
+    df.select(f.explode(df.properties).alias('properties')).select('properties.*').show(truncate=False)
+
     #base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
     #print("test")
     #result_new = base_df.join(result, base_df.tract == result.tractID, "left").drop('tractID')\
