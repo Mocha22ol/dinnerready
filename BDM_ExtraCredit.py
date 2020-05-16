@@ -76,11 +76,11 @@ if __name__=='__main__':
     tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
-    result = spark.createDataFrame(result, ('tractID','tweets'))
-    print("start base structure")
-    tract, pop = getTracts("hdfs:///tmp/bdm/500cities_tracts.geojson")
-    base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
-    print("test")
+    #result = spark.createDataFrame(result, ('tractID','tweets'))
+    #print("start base structure")
+    #tract, pop = getTracts("hdfs:///tmp/bdm/500cities_tracts.geojson")
+    #base_df = spark.createDataFrame(zip(tract, pop), schema=['tract', 'pop'])
+    #print("test")
     #result_new = base_df.join(result, base_df.tract == result.tractID, "left").drop('tractID')\
     #      .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop')).drop('tweets')
 
