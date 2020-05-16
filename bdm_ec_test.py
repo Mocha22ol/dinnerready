@@ -3,13 +3,6 @@ from pyspark.sql.session import SparkSession
 import csv
 import time
 
-
-def flagDrugTweet(tweet, full_list):                                                        
-    for i in full_list:
-        if tweet.find(i) >= 0:
-            return True
-    return None
-
 def processTweets(pid, records):
 
     with open('drug_sched2.txt') as file:
@@ -24,7 +17,7 @@ def processTweets(pid, records):
     for row in reader:
         if len(row) == 7:
             try:
-                if True:
+                if any(ele in row[5] for ele in full_list) :
                     yield(1,1) 
             except:
                 continue
