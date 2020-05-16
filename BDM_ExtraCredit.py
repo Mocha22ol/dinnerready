@@ -7,7 +7,8 @@ import geopandas as gpd
 import shapely.geometry as geom
 from pyspark.sql import SQLContext
 
-def createIndex(shapefile): 
+def createIndex(shapefile):
+    #create rtree                                                                           
     import rtree
     import fiona.crs
     import geopandas as gpd
@@ -19,12 +20,13 @@ def createIndex(shapefile):
 
 def findZone(p, index, zones):
     match = index.intersection((p.x, p.y, p.x, p.y))
-    for idx in match:
+    for idx in match:                                      
         try:
             if zones.geometry[idx].contains(p):
                 return str(idx)
-        except:    
-            return None
+        except:
+               continue
+    return None
 
 def toCSV(_, records):
     for (tractID),(pop, norm) in records:
