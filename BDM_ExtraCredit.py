@@ -86,7 +86,7 @@ if __name__=='__main__':
     result_new = base_df.join(result, base_df.plctract10 == result.tweets, "left").drop('tractID')\
           .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop'))
 
-    test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2]，x[3])))\
+    test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2], x[3])))\
         .sortByKey()\
         .mapPartitionsWithIndex(toCSV)\
         .take(10)
