@@ -125,9 +125,8 @@ if __name__=='__main__':
     centerlines_df_new = (centerlines_df.drop('street_name').withColumnRenamed("street_label", "street_name"))\
     .union(centerlines_df.drop('street_label')).distinct()
 
-    print(centerlines_df_new.take(10))
+    #print(centerlines_df_new.take(10))
     #split tickets into odd and even
-    print("loading4")
     tickets_odds = parking_tickets_df.filter(parking_tickets_df.even_flag == False)
     tickets_evens = parking_tickets_df.filter(parking_tickets_df.even_flag == True)
     #split segments into odd and even
@@ -135,7 +134,6 @@ if __name__=='__main__':
     centerlines_evens = centerlines_df_new.filter(centerlines_df_new.even_flag == True)
     
     #odd join odd, get each year's count by physicalID
-    print("loading5")
     odds_result = broadcast(centerlines_odds).join(tickets_odds,\
                             ((tickets_odds.house_number_1 <= centerlines_odds.high_house_number_1)&(tickets_odds.house_number_1 >= centerlines_odds.low_house_number_1)&(tickets_odds.house_number_2 <= centerlines_odds.high_house_number_2)&(tickets_odds.house_number_2 >= centerlines_odds.low_house_number_2))&\
                             ((tickets_odds.street_name == centerlines_odds.street_name))&\
@@ -156,11 +154,9 @@ if __name__=='__main__':
     new_result = full_result.groupBy(full_result.physicalID)\
     .pivot("year", ["2015", "2016", "2017", "2018", "2019"])\
     .sum("count")
-    print("loading6")
     #use the full list as the base for the join, fill the nones with 0
     final_result = centerline_base.join(new_result, (centerline_base.ID == new_result.physicalID), 'left')\
     .fillna({'2015':'0','2016':'0', '2017':'0','2018':'0','2019':'0'}).drop('dummy','physicalID')
-    print("loading7")
     #calculate coef, sort by id and output as csv
     final_result.rdd.map(lambda x: (x[0], (x[1],x[2],x[3],x[4],x[5],getCoef(x[1:6]))))\
         .sortByKey()\
