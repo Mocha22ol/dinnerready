@@ -8,8 +8,7 @@ import shapely.geometry as geom
 from pyspark.sql import SQLContext
 
 
-def createIndex(shapefile):
-    #create rtree                                                                           
+def createIndex(shapefile):                                                                         
     import rtree
     import fiona.crs
     import geopandas as gpd
@@ -24,7 +23,7 @@ def findZone(p, index, zones):
     for idx in match:                                      
         try:
             if zones.geometry[idx].contains(p):
-                return zones.properties.plctract10[idx]
+                return str(zones.plctract10[idx])
         except:
                continue
     return None
@@ -53,7 +52,7 @@ def processTweets(pid, records):
                 if row[1] and row[2] and any(ele in row[5] for ele in full_list):
                     print("test")
                     p = geom.Point(proj(float(row[2]),float(row[1])))
-                    tract = findzone(p, index, zones)
+                    tract = findZone(p, index, zones)
                     yield(tract,1)
                     break
             except:
@@ -68,20 +67,20 @@ if __name__=='__main__':
     print("***START***")
     print(current_time)
     print("compiling tweets")
-    tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
+    tweets = sc.textFile(sys.argv[1])
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
     print(result.take(10))
     #start base structure of full tractid and population
-    #df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
-    #df.schema()
-    #base_df = df.select(f.explode(df.features.properties).alias('properties')).select('properties.*')
+    df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
+    #only keep the tract and population columns from geojson
+    base_df = df.select(f.explode(df.features.properties).alias('properties')).select('properties.*')
 #
-    #
-    #result_new = base_df.join(result, base_df.plctract10 == result.tweets, "left").drop('tractID')\
-    #      .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop')).drop('tweets')
-#
-    #test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2])))\
-    #    .sortByKey()\
-    #    .mapPartitionsWithIndex(toCSV)\
-    #    .take(10)
+    #join with the result by tract ID, normalize  the value
+    result_new = base_df.join(result, base_df.plctract10 == result.tweets, "left").drop('tractID')\
+          .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop')).drop('tweets')
+#   #sort by key and export as csv
+    test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2])))\
+        .sortByKey()\
+        .mapPartitionsWithIndex(toCSV)\
+        .saveAsTextFile(sys.argv[2])
