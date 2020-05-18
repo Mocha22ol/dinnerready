@@ -24,7 +24,7 @@ def findZone(p, index, zones):
     for idx in match:                                      
         try:
             if zones.geometry[idx].contains(p):
-                return zones.plctract10[idx]
+                return zones.properties.plctract10[idx]
         except:
                continue
     return None
@@ -49,10 +49,12 @@ def processTweets(pid, records):
     for row in reader:
         if len(row) == 7:
             try:
+                # if it has drug term, geosearch and yield tract ID
                 if row[1] and row[2] and any(ele in row[5] for ele in full_list):
                         p = geom.Point(proj(float(row[2]),float(row[1])))
                         tract = findzone(p, index, zones)
                         yield(tract,1)
+                        break
             except:
                 continue
 
@@ -68,16 +70,17 @@ if __name__=='__main__':
     tweets = sc.textFile('hdfs:///tmp/bdm/tweets-100m.csv')
     result = tweets.mapPartitionsWithIndex(processTweets)\
             .reduceByKey(lambda x,y: x+y)
-    result.take(10)
-    #print("start base structure")
+    print(result.take(10))
+    #start base structure of full tractid and population
     #df = sqlContext.read.load('hdfs:///tmp/bdm/500cities_tracts.geojson', format="json")
+    #df.schema()
     #base_df = df.select(f.explode(df.features.properties).alias('properties')).select('properties.*')
 #
     #
     #result_new = base_df.join(result, base_df.plctract10 == result.tweets, "left").drop('tractID')\
-    #      .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop'))
+    #      .fillna({'tweets':'0'}).withColumn('norm', f.col('tweets')/f.col('pop')).drop('tweets')
 #
-    #test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2], x[3])))\
+    #test = result_new.rdd.map(lambda x: (x[0], (x[1],x[2])))\
     #    .sortByKey()\
     #    .mapPartitionsWithIndex(toCSV)\
     #    .take(10)
