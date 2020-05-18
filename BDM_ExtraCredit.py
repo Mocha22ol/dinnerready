@@ -6,7 +6,6 @@ import time
 import geopandas as gpd
 import shapely.geometry as geom
 from pyspark.sql import SQLContext
-import scala
 
 
 def createIndex(shapefile):
