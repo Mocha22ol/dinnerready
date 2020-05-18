@@ -6,6 +6,7 @@ import time
 import geopandas as gpd
 import shapely.geometry as geom
 from pyspark.sql import SQLContext
+import sys
 
 
 def createIndex(shapefile):                                                                         
@@ -50,7 +51,7 @@ def processTweets(pid, records):
             try:
                 # if it has drug term, geosearch and yield tract ID
                 if row[1] and row[2] and any(ele in row[5] for ele in full_list):
-                    print("test")
+                
                     p = geom.Point(proj(float(row[2]),float(row[1])))
                     tract = findZone(p, index, zones)
                     yield(tract,1)
